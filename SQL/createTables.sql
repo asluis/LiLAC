@@ -1,3 +1,7 @@
+drop database if exists LiLac;
+create database LiLac;
+use LiLac;
+
 /* Creating the schema for tables */
 DROP TABLE IF EXISTS Flower;
 CREATE TABLE Flower (
@@ -59,13 +63,17 @@ INSERT INTO Florist VALUES(1005, 15, '2021-11-8');
 /* Triggers for Database */
 
 /* Trigger: whenever a new type of flower is added, florist buys 50 of them */
+delimiter //
 create trigger AddFlowerInventory 
 after insert on Flower
 for each row
-when new.fID not in (select fID from florist)
+
 begin
-	insert into Florist values (new.fID, 50, DATE('now'));
-end;
+	IF (new.fID not in (select fID from florist))
+    THEN
+		insert into Florist values (new.fID, 50, CURDATE());
+	END IF;
+end; //
 
 /* Trigger: whenever a new type of flower is added, florist creates a bouquet of that new flower.
 The price of this new bouquet is 5 multiplied by the price of each flower. 
@@ -74,14 +82,16 @@ The number of this bouquet is defaulted to 5.
 The amount of flowers in the bouquet is defaulted to 5. 
 The bID of this new bouquet is 1 + highest bID
 */
+delimiter //
 create trigger AddFlowerBouquet
 after insert on Flower
 for each row
-when new.fID not in (select fID from Bouquet)
 begin
-	insert into Bouquet values (5 * new.fPrice, new.fName || ' Bouquet' , 5, 5, new.fID, 1+(select max (bID) from bouquet));
-end;
-
+    IF new.fID not in (select fID from Bouquet) 
+    THEN
+        insert into Bouquet values (5 * new.fPrice, CONCAT(new.fname, ' Bouquet') , 5, 5, new.fID, 1+(select max(bID) as bID from bouquet as b2));
+    end if;
+end; //
 
 
 
