@@ -110,7 +110,7 @@ The number of this bouquet is defaulted to 5.
 The amount of flowers in the bouquet is defaulted to 5. 
 The bID of this new bouquet is 1 + highest bID
 */
-DROP TRIGGER IF EXISTS AddFlowBouquet;
+DROP TRIGGER IF EXISTS AddFlowerBouquet;
 delimiter //
 create trigger AddFlowerBouquet
 after insert on Flower
