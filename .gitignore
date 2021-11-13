@@ -30,7 +30,7 @@ hs_err_pid*
 *.DS_Store
 *.idea/
 *out/
-iChess.iml
+*.iml
 
 # Database files
 *.txt
