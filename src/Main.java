@@ -1,3 +1,4 @@
+import Controller.Controller;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
@@ -11,7 +12,8 @@ public class Main extends Application {
         primaryStage.setTitle("LiLAC");
         primaryStage.setHeight(1000);
         primaryStage.setWidth(1000);
-        primaryStage.show();
+        Controller ctrl = new Controller(primaryStage);
+        ctrl.start();
     }
 
     public static void main(String[] args){
