@@ -12,7 +12,6 @@ fID INT,
 PRIMARY KEY(fID)
 );
 
-
 DROP TABLE IF EXISTS Bouquet;
 CREATE TABLE Bouquet (
 bPrice INT,
@@ -35,9 +34,9 @@ FOREIGN KEY (fID) REFERENCES Flower(fID)
 
 DROP TABLE IF EXISTS Customer;
 CREATE TABLE Customer (
+cID INT,
 cName VARCHAR(50) NOT NULL UNIQUE,
-bID INT,
-FOREIGN KEY(bID) REFERENCES Bouquet(bID),
+PRIMARY KEY(cID)
 );
 
 DROP TABLE IF EXISTS Sale;
@@ -49,7 +48,6 @@ packaging VARCHAR(50),
 FOREIGN KEY (bID) REFERENCES Bouquet (bID),
 FOREIGN KEY (cID) REFERENCES Customer (cID)
 );
-
 
 /* Populating tables with data */
 INSERT INTO Flower VALUES("Rose", "red", 3, 1001);
@@ -70,13 +68,13 @@ INSERT INTO Florist VALUES(1003, 46, '2021-10-25');
 INSERT INTO Florist VALUES(1004, 25, '2021-10-22');
 INSERT INTO Florist VALUES(1005, 15, '2021-11-8');
 
-INSERT INTO Customer VALUES('Gracie Chung', 201);
-INSERT INTO Customer VALUES('Alex Harris', 202);
-INSERT INTO Customer VALUES('Sungchan Jung', 203);
-INSERT INTO Customer VALUES('Erin Mac', 204);
-INSERT INTO Customer VALUES('Hayden Edwards', 205);
-INSERT INTO Customer VALUES('Sen Fall', 206);
-INSERT INTO Customer VALUES('Jisung Park', 207);
+INSERT INTO Customer VALUES(201, 'Gracie Chung');
+INSERT INTO Customer VALUES(202, 'Alex Harris');
+INSERT INTO Customer VALUES(203, 'Sungchan Jung');
+INSERT INTO Customer VALUES(204, 'Erin Mac');
+INSERT INTO Customer VALUES(205, 'Hayden Edwards');
+INSERT INTO Customer VALUES(206, 'Sen Fall');
+INSERT INTO Customer VALUES(207, 'Jisung Park');
 
 INSERT INTO Sale VALUES(204, 2, 30, 'vase');
 INSERT INTO Sale VALUES(204, 1, 15, 'vase');
@@ -86,11 +84,7 @@ INSERT INTO Sale VALUES(203, 3, 30, 'vase');
 INSERT INTO Sale VALUES(201, 1, 15, 'vase');
 INSERT INTO Sale VALUES(201, 1, 15, 'vase');
 
-/* Triggers for Database */
-
-
 /* Trigger: whenever a new type of flower is added, florist buys 50 of them */
-DROP TRIGGER IF EXISTS AddFlowerInventory;
 delimiter //
 create trigger AddFlowerInventory 
 after insert on Flower
@@ -110,7 +104,7 @@ The number of this bouquet is defaulted to 5.
 The amount of flowers in the bouquet is defaulted to 5. 
 The bID of this new bouquet is 1 + highest bID
 */
-DROP TRIGGER IF EXISTS AddFlowerBouquet;
+
 delimiter //
 create trigger AddFlowerBouquet
 after insert on Flower
@@ -121,6 +115,46 @@ begin
         insert into Bouquet values (5 * new.fPrice, CONCAT(new.fname, ' Bouquet') , 5, 5, new.fID, 1+(select max(bID) as bID from bouquet as b2));
     end if;
 end; //
+
+/* Stored procedure to get a customer's bouquet ID and bouquet type
+Call example: 
+mysql> call getCustomerBouquetByName('Erin Mac');
++--------------+
+| bouquetName  |
++--------------+
+| Lily Bouquet |
+| Rose Bouquet |
++--------------+
+*/
+delimiter //
+create procedure getCustomerBouquetByName(IN inputcName VARCHAR(50))
+begin
+	select Bouquet.bName as bouquetName
+    from Customer
+    inner join Sale using (cID)
+    inner join Bouquet using (bID)
+    where cName = inputcName;
+end//
+delimiter ;
+
+/* Stored procedure to calculate a customer's total purchase 
+Call example: 
+mysql> call getTotalSpentByCustomerName('Erin Mac');
++------------+
+| totalPrice |
++------------+
+|         45 |
++------------+
+*/
+delimiter //
+create procedure getTotalSpentByCustomerName(IN inputcName VARCHAR(50))
+begin
+	select sum(Sale.pricePaid) as totalPrice
+    from Customer
+    inner join Sale using (cID)
+    where cName = inputcName;
+end//
+delimiter ;
 
 
 
