@@ -13,6 +13,7 @@ public class MainMenu extends VBox {
     private Button createAccount;
     private Controller ctrl;
     private Label title;
+    private Button addFlower;
 
     public MainMenu(Controller controller){
         this.ctrl = controller;
@@ -28,6 +29,9 @@ public class MainMenu extends VBox {
         // TODO: Handle event correctly
         createAccount.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> System.out.println("Signup clicked"));
 
+        addFlower = new Button("Create flower");
+        addFlower.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> System.out.println("Add flower") );
+
         login.setPrefSize(300,150);
         createAccount.setPrefSize(300, 150);
 
@@ -37,5 +41,6 @@ public class MainMenu extends VBox {
         getChildren().add(title);
         getChildren().add(login);
         getChildren().add(createAccount);
+        getChildren().add(addFlower);
     }
 }
